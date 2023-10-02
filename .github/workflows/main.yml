@@ -1,0 +1,21 @@
+name: push container image
+
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: build and push
+      run: |
+        IMAGE_NAME=sample_image:${GITHUB_REF#refs/heads/}
+        docker build --t ghcr.io/${GITHUB_REPOSITORY}/${IMAGE_NAME}
+        docker login ghcr.io --username ${DOCKER_USERNAME} --password ${DOCKER_PASSWORD}
+        docker push ghcr.io/oyuyo/docker_image_to_gh_package/${IMAGE_NAME}
+      env:
+        DOCKER_USERNAME: ${{ secrets.GH_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
